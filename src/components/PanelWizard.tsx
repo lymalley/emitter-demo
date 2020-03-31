@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { makeStyles, Theme, createStyles } from '@material-ui/core'
-import Panel, { PanelProps, PanelChangeProps } from './Panel'
-import Emitter from 'eventemitter3'
+import Panel, { PanelChangeProps } from './Panel'
+import EventEmitter from 'eventemitter3'
 import ReservationStateMachine from './ReservationStateMachine'
+export const Emitter_ = new EventEmitter()
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -25,9 +27,8 @@ const getComonent = (id: string) => {
 const PanelWizard = () => {
   const classes = useStyles()
   const StateMachine = ReservationStateMachine()
-  const { emitter_, panels, activePanel, opened, setActivePanel } = StateMachine
-  const [panelState, setPanelState] = useState(StateMachine)
-  // const [emitter, setEmitter]=useState()
+  const { panels, activePanel, opened, setActivePanel, } = StateMachine
+  const [panelState, setPanelState] = useState(panels)
 
   const getInd = (id: string) => {
     // const l=props.panels.length
@@ -36,46 +37,65 @@ const PanelWizard = () => {
   }
   //init set
   useEffect(() => {
-    // const em_=StateMachine.emitter_
-    setPanelState(StateMachine)
-    //setEmitter(em_)
-    emitter_.on("PanelEvent", (data) => {
-      const i = getInd(data.id)
-      if (data.type === "setActive") {
-
-        setActivePanel(i)
-      } else if (data.type === "continue") {
-        setActivePanel(i + 1)
+    Emitter_.on("PanelEvent", panelRequest)
+  }, [])
+  const panelRequest = (data: PanelChangeProps) => {
+    const i = getInd(data.id)
+    if (data.type === "setActive") {
+      setActivePanel(i)
+    } else if (data.type === "continue") {
+      setActivePanel(i + 1)
+    }
+  }
+  const hasErrors = (panel: any) => {
+    if (panel.hasOwnProperty("error")) {
+      return panel.error
+    } else {
+      return false
+    }
+  }
+  const incomplete = (panel: any) => {
+    if (panel.hasOwnProperty("completed")) {
+      return !panel.completed
+    }
+    else {
+      return false
+    }
+  }
+  //will implement this to stop acknowledge and error caused by later change
+  const checkForAnyErrors = (id: string) => {
+    const i = getInd(id)
+    let errs = []
+    panels.forEach(p => {
+      if (i >= getInd(p.id)) {
+        if (hasErrors(p) || incomplete(p)) {
+          errs.push(p.id)
+        }
       }
     })
-  }, [])
-  // useEffect(()=>{
-  //  if (emitter_ !== undefined) { emitter_.on("PanelEvent", (data: any)=>{
-
-  //   })}
-  // }, [emitter])
+    return errs.length > 0 ? true : false
+  }
 
   //on update
   useEffect(() => {
-    if (panelState !== StateMachine) {
-      setPanelState(StateMachine)
+    if (panelState !== panels) {
+      setPanelState(panels)
     }
 
-  }, [panelState, StateMachine])
+  }, [panelState, panels])
   return (
     <div className={classes.root}>
-      {panelState.panels.map((p: any) => <Panel
+      {panelState.map((p: any) => <Panel key={p.id}
         title={p.title}
         open={Boolean(getInd(p.id) === activePanel || opened.includes(p.id))}
         dimmed={p.dimmed}
         completed={p.completed}
         continueVisable={p.continueVisable && panels.length !== getInd(p.id)}
         continueDimmed={p.continueDimmed}
-        error={p.error}
+        error={p.error || !checkForAnyErrors(p.id)}
         component={getComonent(p.id)}
         id={p.id}
         icon={p.icon}
-        emitter={StateMachine.emitter_}
       />)}
     </div>
   )

@@ -14,6 +14,11 @@ import {
 import Box from '@material-ui/core/Box'
 import CheckIcon from "@material-ui/icons/Check";
 import ErrorIcon from "@material-ui/icons/Error"
+import { Emitter_ } from './PanelWizard'
+export const panelEmitter = {
+  continue: (id: string) => Emitter_.emit("PanelEvent", { type: "continue", id: id }),
+  setActive: (id: string) => Emitter_.emit("PanelEvent", { type: "setActive", id: id })
+}
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     heading: {
@@ -54,17 +59,13 @@ export interface PanelProps {
   title: string | ReactElement
   open: boolean
   dimmed?: boolean
-  //visable: boolean
   completed?: boolean
   continueVisable?: boolean
   continueDimmed?: boolean
   error?: boolean
   component: any
-  // handlePanelChange: (obj: PanelChangeProps) => void
-  //if active index or open
   id: string
   icon?: ReactNode
-  emitter: any
 }
 const Panel = (props: PanelProps) => {
   const classes = useStyles()
@@ -79,11 +80,11 @@ const Panel = (props: PanelProps) => {
       setPanelState(props)
     }
   }, [panelState, props])
-  const handlePanelChange = (obj: PanelChangeProps) => {
-    props.emitter.emit("PanelEvent", obj)
-  }
+
   return (
-    <ExpansionPanel id={props.id} expanded={props.open} disabled={props.dimmed} onChange={() => handlePanelChange({ type: "setActive", id: props.id })}>
+    <ExpansionPanel id={props.id} expanded={props.open} disabled={props.dimmed}
+      onChange={() => panelEmitter.setActive(props.id)}
+    >
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
         <Box className={classes.heading}>
           <Box className={classes.icon}>
@@ -100,7 +101,7 @@ const Panel = (props: PanelProps) => {
             disabled={props.continueDimmed}
             variant="contained"
             color="primary"
-            onClick={() => handlePanelChange({ type: "continue", id: props.id })}
+            onClick={() => panelEmitter.continue(props.id)}
             size="small"
           >
             Continue

@@ -1,5 +1,4 @@
-import Emitter from 'eventemitter3'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 //send all reservation state down
 const ReservationStateMachine = () => {
   //pass in the reservation state obj
@@ -12,6 +11,7 @@ const ReservationStateMachine = () => {
       title: '',
       id: '',
       visable: true
+
       // open: activePanel===0 ||
     },
     {
@@ -27,7 +27,6 @@ const ReservationStateMachine = () => {
     }
   ]
   const [panels, setPanels] = useState(panels_)
-  const emitter_ = new Emitter()
 
   useEffect(() => {
     if (currentEvent.eventId !== state.eventId) {
@@ -50,7 +49,7 @@ const ReservationStateMachine = () => {
       //maybe set errors and/or completed here or if mult need to be open at once push in open
     })
   }
-  return { panels, emitter_, activePanel, setActivePanel, opened }
+  return { panels, activePanel, setActivePanel, opened }
 }
 
 export default ReservationStateMachine

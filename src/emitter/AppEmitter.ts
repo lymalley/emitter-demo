@@ -17,3 +17,4 @@ class AppEmitter_ {
 
 const AppEmitter: Emitter = AppEmitter_.Instance()
 export default AppEmitter
+export const Emitter_ = new Emitter()
