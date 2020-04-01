@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { makeStyles, Theme, createStyles } from '@material-ui/core'
-import Panel, { PanelChangeProps } from './Panel'
-import EventEmitter from 'eventemitter3'
+import Panel from './Panel'
+import { PanelChangeProps } from './Types'
+import { Emitter_, PanelEvents, EmitterEvents } from './emitter'
 import ReservationStateMachine from './ReservationStateMachine'
-export const Emitter_ = new EventEmitter()
+import { getComponent } from './ReservationPanels'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -16,14 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   })
 )
-//components and icons can be passed here
-const getComonent = (id: string) => {
-  if (id === "") {
-    return (<div>first panel</div>)
-  } else if (id === "Event Add Ons") {
-    return <div>Event Add Ons Panel</div>
-  } else return <div>Component Not Found</div>
-}
+
 const PanelWizard = () => {
   const classes = useStyles()
   const StateMachine = ReservationStateMachine()
@@ -31,19 +25,20 @@ const PanelWizard = () => {
   const [panelState, setPanelState] = useState(panels)
 
   const getInd = (id: string) => {
-    // const l=props.panels.length
-    const i = panels.findIndex(r => r.id === id)
+    const i = panels.findIndex(r => r.title === id)
     return i + 1
   }
   //init set
   useEffect(() => {
-    Emitter_.on("PanelEvent", panelRequest)
+    Emitter_.on(EmitterEvents.PanelEvent, panelRequest)
   }, [])
   const panelRequest = (data: PanelChangeProps) => {
     const i = getInd(data.id)
-    if (data.type === "setActive") {
+    if (data.type === PanelEvents.SetActive) {
       setActivePanel(i)
-    } else if (data.type === "continue") {
+    } else if (data.type === PanelEvents.SetInactive) {
+      setActivePanel(-1)
+    } else if (data.type === PanelEvents.Continue) {
       setActivePanel(i + 1)
     }
   }
@@ -67,9 +62,9 @@ const PanelWizard = () => {
     const i = getInd(id)
     let errs = []
     panels.forEach(p => {
-      if (i >= getInd(p.id)) {
+      if (i >= getInd(p.title)) {
         if (hasErrors(p) || incomplete(p)) {
-          errs.push(p.id)
+          errs.push(p.title)
         }
       }
     })
@@ -83,18 +78,19 @@ const PanelWizard = () => {
     }
 
   }, [panelState, panels])
+  console.log("Panels", panels)
   return (
     <div className={classes.root}>
-      {panelState.map((p: any) => <Panel key={p.id}
+      {panelState.map((p: any) => <Panel key={p.title}
         title={p.title}
-        open={Boolean(getInd(p.id) === activePanel || opened.includes(p.id))}
+        open={Boolean(getInd(p.title) === activePanel || opened.includes(p.title))}
         dimmed={p.dimmed}
         completed={p.completed}
-        continueVisable={p.continueVisable && panels.length !== getInd(p.id)}
+        continueVisible={p.continueVisible && panels.length !== getInd(p.title)}
         continueDimmed={p.continueDimmed}
-        error={p.error || !checkForAnyErrors(p.id)}
-        component={getComonent(p.id)}
-        id={p.id}
+        error={p.error || checkForAnyErrors(p.title)}
+        component={getComponent(p.title)}
+        id={p.title}
         icon={p.icon}
       />)}
     </div>

@@ -1,31 +1,15 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
+import { getPanelInfo } from './ReservationPanels'
 //send all reservation state down
 const ReservationStateMachine = () => {
   //pass in the reservation state obj
   const [state, setState] = useState({ eventId: -1 })
   const [activePanel, setActivePanel] = useState(1)
+  //to be used if mult need to be open at once
   const [opened, setOpen] = useState<string[]>([])
   const currentEvent = { eventId: 1, addOns: [' '] } //useSelector to get from store and update with useEffect
-  const panels_ = [
-    {
-      title: '',
-      id: '',
-      visable: true
 
-      // open: activePanel===0 ||
-    },
-    {
-      title: 'Event Add Ons',
-      id: 'Event Add Ons',
-      visable: Boolean(currentEvent.addOns.length > 0)
-      //need added logic.  also can be done in panel wizard if prefer
-      // dimmed?: logic
-      // completed: true
-      //continueVisable?: boolean
-      // continueDimmed?: boolean
-      /// error?: boolean
-    }
-  ]
+  const panels_ = getPanelInfo(currentEvent)
   const [panels, setPanels] = useState(panels_)
 
   useEffect(() => {
@@ -36,7 +20,7 @@ const ReservationStateMachine = () => {
       let p: any = []
 
       panels_.map(t => {
-        if (t.visable) {
+        if (t.visible) {
           p.push(t)
         }
       })

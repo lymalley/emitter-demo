@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, ReactElement } from 'react'
+import React, { useState, useEffect } from 'react'
 import ExpansionPanel from '@material-ui/core/ExpansionPanel'
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
@@ -14,11 +14,8 @@ import {
 import Box from '@material-ui/core/Box'
 import CheckIcon from "@material-ui/icons/Check";
 import ErrorIcon from "@material-ui/icons/Error"
-import { Emitter_ } from './PanelWizard'
-export const panelEmitter = {
-  continue: (id: string) => Emitter_.emit("PanelEvent", { type: "continue", id: id }),
-  setActive: (id: string) => Emitter_.emit("PanelEvent", { type: "setActive", id: id })
-}
+import { panelEmitter } from './emitter'
+import { PanelProps } from './Types'
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     heading: {
@@ -51,22 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export interface PanelChangeProps {
-  type: string
-  id: string
-}
-export interface PanelProps {
-  title: string | ReactElement
-  open: boolean
-  dimmed?: boolean
-  completed?: boolean
-  continueVisable?: boolean
-  continueDimmed?: boolean
-  error?: boolean
-  component: any
-  id: string
-  icon?: ReactNode
-}
+
 const Panel = (props: PanelProps) => {
   const classes = useStyles()
   const [panelState, setPanelState] = useState<PanelProps>(props)
@@ -80,10 +62,17 @@ const Panel = (props: PanelProps) => {
       setPanelState(props)
     }
   }, [panelState, props])
-
+  const handleChange = (id: string) => {
+    if (props.open) {
+      panelEmitter.setInactive(id)
+    } else {
+      panelEmitter.setActive(id)
+    }
+  }
+  console.log("props", props)
   return (
     <ExpansionPanel id={props.id} expanded={props.open} disabled={props.dimmed}
-      onChange={() => panelEmitter.setActive(props.id)}
+      onChange={() => handleChange(props.id)}
     >
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
         <Box className={classes.heading}>
@@ -96,7 +85,7 @@ const Panel = (props: PanelProps) => {
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>{props.component}</ExpansionPanelDetails>
       <ExpansionPanelActions>
-        {props.continueVisable ? (
+        {props.continueVisible ? (
           <Button
             disabled={props.continueDimmed}
             variant="contained"
