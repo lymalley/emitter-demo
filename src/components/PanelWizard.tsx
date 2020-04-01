@@ -25,7 +25,7 @@ const PanelWizard = () => {
   const [panelState, setPanelState] = useState(panels)
 
   const getInd = (id: string) => {
-    const i = panels.findIndex(r => r.title === id)
+    const i = panels.findIndex((r: any) => r.id === id)
     return i + 1
   }
   //init set
@@ -61,10 +61,10 @@ const PanelWizard = () => {
   const checkForAnyErrors = (id: string) => {
     const i = getInd(id)
     let errs = []
-    panels.forEach(p => {
-      if (i >= getInd(p.title)) {
+    panels.forEach((p: any) => {
+      if (i >= getInd(p.id)) {
         if (hasErrors(p) || incomplete(p)) {
-          errs.push(p.title)
+          errs.push(p.id)
         }
       }
     })
@@ -78,18 +78,17 @@ const PanelWizard = () => {
     }
 
   }, [panelState, panels])
-  console.log("Panels", panels)
   return (
     <div className={classes.root}>
-      {panelState.map((p: any) => <Panel key={p.title}
+      {panelState.map((p: any) => <Panel key={p.id}
         title={p.title}
-        open={Boolean(getInd(p.title) === activePanel || opened.includes(p.title))}
+        open={Boolean(getInd(p.id) === activePanel || opened.includes(p.id))}
         dimmed={p.dimmed}
         completed={p.completed}
-        continueVisible={p.continueVisible && panels.length !== getInd(p.title)}
+        continueVisible={p.continueVisible && panels.length !== getInd(p.id)}
         continueDimmed={p.continueDimmed}
-        error={p.error || checkForAnyErrors(p.title)}
-        component={getComponent(p.title)}
+        error={p.error || checkForAnyErrors(p.id)}
+        component={getComponent(p.id)}
         id={p.title}
         icon={p.icon}
       />)}

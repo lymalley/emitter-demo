@@ -69,7 +69,6 @@ const Panel = (props: PanelProps) => {
       panelEmitter.setActive(id)
     }
   }
-  console.log("props", props)
   return (
     <ExpansionPanel id={props.id} expanded={props.open} disabled={props.dimmed}
       onChange={() => handleChange(props.id)}

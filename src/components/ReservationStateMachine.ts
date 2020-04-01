@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getPanelInfo } from './ReservationPanels'
+import { linkStore } from '../emitter/store'
 //send all reservation state down
 const ReservationStateMachine = () => {
   //pass in the reservation state obj
@@ -7,26 +8,23 @@ const ReservationStateMachine = () => {
   const [activePanel, setActivePanel] = useState(1)
   //to be used if mult need to be open at once
   const [opened, setOpen] = useState<string[]>([])
-  const currentEvent = { eventId: 1, addOns: [' '] } //useSelector to get from store and update with useEffect
-
-  const panels_ = getPanelInfo(currentEvent)
+  const appState = linkStore
+  const params = {
+    ticketRequiredFields: appState.currentEvent.ticketRequiredFields,
+    questionGroupId: appState.currentEvent.questionGroupId,
+    questions: appState.questions,
+    addOnsLength: appState.currentEvent.addOns.length
+  }
+  const panels_ = getPanelInfo(params)
   const [panels, setPanels] = useState(panels_)
 
   useEffect(() => {
-    if (currentEvent.eventId !== state.eventId) {
-      setState({ ...state, eventId: currentEvent.eventId })
+    if (appState.currentEvent.eventId !== state.eventId) {
+      setState({ ...state, eventId: appState.currentEvent.eventId })
       //update all State
       GetPanels()
-      let p: any = []
-
-      panels_.map(t => {
-        if (t.visible) {
-          p.push(t)
-        }
-      })
-      setPanels(p)
     }
-  }, [currentEvent, state.eventId])
+  }, [appState.currentEvent, state.eventId])
   const GetPanels = () => {
     //pass back only the nec panels,
     panels.forEach((p: any) => {
