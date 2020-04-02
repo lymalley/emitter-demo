@@ -4,7 +4,7 @@ import Panel from './Panel'
 import { PanelChangeProps } from './Types'
 import { Emitter_, PanelEvents, EmitterEvents } from './emitter'
 import ReservationStateMachine from './ReservationStateMachine'
-import { getComponent } from './ReservationPanels'
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -17,16 +17,23 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   })
 )
-
-const PanelWizard = () => {
+interface PanelWizardProps {
+  stateMachine: () => {
+    panels: any;
+    activePanel: number;
+    setActivePanel: React.Dispatch<React.SetStateAction<number>>;
+    opened: string[];
+  }
+}
+const PanelWizard = (props: PanelWizardProps) => {
   const classes = useStyles()
-  const StateMachine = ReservationStateMachine()
+  const StateMachine = props.stateMachine()
   const { panels, activePanel, opened, setActivePanel, } = StateMachine
   const [panelState, setPanelState] = useState(panels)
 
   const getInd = (id: string) => {
     const i = panels.findIndex((r: any) => r.id === id)
-    return i + 1
+    return i
   }
   //init set
   useEffect(() => {
@@ -88,7 +95,7 @@ const PanelWizard = () => {
         continueVisible={p.continueVisible && panels.length !== getInd(p.id)}
         continueDimmed={p.continueDimmed}
         error={p.error || checkForAnyErrors(p.id)}
-        component={getComponent(p.id)}
+        component={p.component}
         id={p.title}
         icon={p.icon}
       />)}

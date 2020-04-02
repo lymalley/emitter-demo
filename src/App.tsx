@@ -4,7 +4,7 @@ import './App.css'
 import PanelWizard from './components/PanelWizard'
 import { useDispatch } from 'react-redux'
 import { INIT_LINK_STORE } from './emitter/store'
-
+import ReservationStateMachine from './components/ReservationStateMachine'
 function App() {
   const dispatch = useDispatch()
   useEffect(() => {
@@ -15,7 +15,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <PanelWizard />
+        <PanelWizard stateMachine={ReservationStateMachine} />
       </header>
     </div>
   )

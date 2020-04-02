@@ -74,13 +74,14 @@ const Panel = (props: PanelProps) => {
       onChange={() => handleChange(props.id)}
     >
       <ExpansionPanelSummary expandIcon={<ExpandMore />}>
-        <Box className={classes.heading}>
-          <Box className={classes.icon}>
-            {props.icon ? props.icon : null}
-            {props.completed ? <CheckIcon className={classes.checkIcon} /> : props.error ? <ErrorIcon className={classes.errorIcon} /> : null}
-          </Box>
-          <Typography className={classes.title}>{props.title}</Typography>
-        </Box>
+        {props.customSummary ? props.customSummary :
+          <Box className={classes.heading}>
+            <Box className={classes.icon}>
+              {props.icon ? props.icon : null}
+              {props.completed ? <CheckIcon className={classes.checkIcon} /> : props.error ? <ErrorIcon className={classes.errorIcon} /> : null}
+            </Box>
+            <Typography className={classes.title}>{props.title}</Typography>
+          </Box>}
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>{props.component}</ExpansionPanelDetails>
       <ExpansionPanelActions>

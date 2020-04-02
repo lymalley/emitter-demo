@@ -1,12 +1,8 @@
 import React from 'react'
 import SampleComponent from './SampleComponent'
-// export enum PanelId {
-//     _ = "",
-//     EventAddOns = 'Event Add Ons',
-//     SampleComponent = "Sample Component"
-// }
+
 export enum PanelId {
-    _ = "",
+    Description = "Description",
     EventDates = "Event Dates",
     TicketRates = "Ticket Rates",
     EventTimes = "Event Times",
@@ -17,45 +13,52 @@ export enum PanelId {
 export const getPanelInfo = (props: any) => {
     const panels = [
         {
-            id: PanelId._,
-            title: PanelId._,
-            visible: true
+            id: PanelId.Description,
+            title: "",
+            visible: true,
+            component: <SampleComponent />
 
         },
         {
             title: PanelId.EventDates,
             id: PanelId.EventDates,
             visible: true,
-            continueVisible: true
+            continueVisible: true,
+            component: <SampleComponent />
         },
         {
             title: PanelId.TicketRates,
             id: PanelId.TicketRates,
             visible: true,
             continueVisible: true,
+            component: <SampleComponent />
         },
         {
             title: PanelId.EventTimes,
             id: PanelId.EventTimes,
             visible: true,
             continueVisible: true,
+            component: <SampleComponent />
         },
         {
             title: PanelId.ReservationHolder,
             id: PanelId.ReservationHolder,
-            visible: true
+            visible: true,
+            component: <SampleComponent />
         },
         {
             title: PanelId.Questions,
             id: PanelId.Questions,
             visible: props.ticketRequiredFields > 0 || props.questionGroupId > 0 || (props.questions && props.questions.length > 0),
-            continueVisible: true
+            continueVisible: true,
+            component: <SampleComponent />
         },
         {
             id: PanelId.EventAddOns,
             title: PanelId.EventAddOns,
             visible: Boolean(props.addOnsLength > 0),
-            continueVisible: true
+            continueVisible: true,
+            component: <SampleComponent />
             //need added logic.  also can be done in panel wizard if prefer
             // dimmed?: logic
             // completed: true
@@ -74,25 +77,3 @@ export const getPanelInfo = (props: any) => {
     return panels_
 }
 
-//components and icons can be passed here
-export const getComponent = (id: string) => {
-    switch (id) {
-        case PanelId._:
-            return (<div>first panel</div>)
-        case PanelId.EventDates:
-            return (<SampleComponent />)
-        case PanelId.TicketRates:
-            return (<div>Third panel</div>)
-        case PanelId.ReservationHolder:
-            return (<div>Reservation Holder</div>)
-        case PanelId.Questions:
-            return <div>Questions</div>
-        case PanelId.EventAddOns:
-            return <div>Event Add Ons Panel</div>
-
-        default:
-            return <div>Component Not Found</div>
-    }
-
-
-}

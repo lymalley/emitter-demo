@@ -13,4 +13,5 @@ export interface PanelProps {
   component: any
   id: string
   icon?: any
+  customSummary?: any
 }
